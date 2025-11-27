@@ -107,7 +107,7 @@ const server = net.createServer((socket) => {
             }
         } catch (err) {
             const msg = err.response?.data || err.message;
-            console.error(`   \x1b[31m✗ CLOUD ERROR:\x1b[0m ${msg}`);
+            console.error(`   \x1b[31m✗ CLOUD ERROR:\x1b[0m ${JSON.stringify(msg)}`);
             socket.write('{2,999,1,[S]LIS Offline}\r\n');
             console.log(`   \x1b[31m⬆ ERROR RESPONSE\x1b[0m TO ANALYZER\n`);
         }
