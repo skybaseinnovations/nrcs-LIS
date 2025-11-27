@@ -75,11 +75,35 @@ const server = net.createServer((socket) => {
             );
 
             const reply = response.data || '';
+            
+            // Check if response is JSON with status field
+            let jsonResponse;
+            try {
+                jsonResponse = typeof reply === 'string' ? JSON.parse(reply) : reply;
+            } catch (e) {
+                jsonResponse = null;
+            }
+
+            if (jsonResponse && typeof jsonResponse.status !== 'undefined') {
+                if (jsonResponse.status === true) {
+                    console.log(`   \x1b[32m✓ SUCCESS\x1b[0m`);
+                    if (jsonResponse.message) {
+                        console.log(`   \x1b[32m→ ${jsonResponse.message}\x1b[0m`);
+                    }
+                } else {
+                    console.log(`   \x1b[31m✗ FAILED\x1b[0m`);
+                    if (jsonResponse.message) {
+                        console.log(`   \x1b[31m→ ${jsonResponse.message}\x1b[0m`);
+                    }
+                }
+            } else {
+                console.log(`   \x1b[32m✓ Cloud response received\x1b[0m`);
+            }
+
             if (reply) {
                 socket.write(reply + '\r\n');
-                console.log(`   \x1b[32m✓ Cloud response received\x1b[0m`);
                 console.log(`   \x1b[34m⬆ RESPONSE\x1b[0m TO ANALYZER`);
-                console.log(`   \x1b[90m${reply}\x1b[0m\n`);
+                console.log(`   \x1b[90m${typeof reply === 'string' ? reply : JSON.stringify(reply)}\x1b[0m\n`);
             }
         } catch (err) {
             const msg = err.response?.data || err.message;
@@ -132,7 +156,7 @@ process.on('SIGINT', () => {
     console.log('\x1b[90mClosing connections...\x1b[0m');
     server.close(() => {
         console.log('\x1b[32m✓ SKYBASE Bridge shutdown complete\x1b[0m');
-        console.log('\x1b[36m👋 See you...\x1b[0m\n');
+        console.log('\x1b[36m👋 See you space cowboy...\x1b[0m\n');
         process.exit(0);
     });
 });
